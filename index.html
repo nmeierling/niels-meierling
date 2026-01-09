@@ -28,6 +28,20 @@
             --white: #ffffff;
         }
 
+        /* Dark mode colors */
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --dark: #e2e8f0;
+            --gray-900: #f8fafc;
+            --gray-700: #cbd5e1;
+            --gray-500: #94a3b8;
+            --gray-300: #475569;
+            --gray-100: #1e293b;
+            --white: #0f172a;
+        }
+
         body {
             font-family: 'Source Sans Pro', sans-serif;
             background: var(--white);
@@ -323,6 +337,127 @@
         }
 
         nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Dark mode toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: var(--gray-300);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+            padding: 0;
+        }
+
+        .theme-toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: var(--white);
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch {
+            background: var(--primary);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch::before {
+            transform: translateX(24px);
+        }
+
+        .theme-toggle-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-700);
+        }
+
+        .theme-toggle .sun-icon {
+            display: block;
+        }
+
+        .theme-toggle .moon-icon {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .sun-icon {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .moon-icon {
+            display: block;
+        }
+
+        @media print {
+            .theme-toggle,
+            .weather-toggle {
+                display: none !important;
+            }
+        }
+
+        /* Weather toggle */
+        .weather-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .weather-toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: var(--gray-300);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+            padding: 0;
+        }
+
+        .weather-toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: var(--white);
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .weather-toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .weather-toggle-switch.active::before {
+            transform: translateX(24px);
+        }
+
+        .weather-toggle-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--gray-500);
+            transition: color 0.3s;
+        }
+
+        .weather-toggle-switch.active + .weather-toggle-icon,
+        .weather-toggle:has(.weather-toggle-switch.active) .weather-toggle-icon {
             color: var(--primary);
         }
 
@@ -802,6 +937,15 @@
             nav ul {
                 display: none;
             }
+
+            .theme-toggle {
+                margin-left: 0;
+            }
+
+            .weather-toggle {
+                margin-left: 10px;
+                padding-left: 10px;
+            }
         }
     </style>
 </head>
@@ -817,7 +961,35 @@
                     <li><a href="#experience">Experience</a></li>
                     <li><a href="#education">Education</a></li>
                     <li><a href="#contact">Contact</a></li>
+                    <li>
+                        <div class="theme-toggle">
+                            <svg class="theme-toggle-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                            <svg class="theme-toggle-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <button class="theme-toggle-switch" id="theme-toggle" aria-label="Toggle dark mode"></button>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="weather-toggle">
+                            <svg class="weather-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18.5 16.5A5.5 5.5 0 0 0 18.5 5.5h-.5a6.5 6.5 0 0 0-12 3.5 4 4 0 0 0-2 7.5h14z"></path>
+                            </svg>
+                            <button class="weather-toggle-switch" id="weather-toggle" aria-label="Toggle weather effects"></button>
+                        </div>
+                    </li>
                 </ul>
+                
             </nav>
         </div>
     </header>
@@ -1160,6 +1332,50 @@
     <footer>
         <p>Niels Meierling - Senior Software Engineer - Germany</p>
     </footer>
+
+    <!-- Dark Mode Toggle -->
+    <script>
+        (function() {
+            const toggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+
+            // Check for saved preference or system preference
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                html.setAttribute('data-theme', 'dark');
+            }
+
+            // Toggle handler
+            toggle.addEventListener('click', function() {
+                const isDark = html.getAttribute('data-theme') === 'dark';
+                if (isDark) {
+                    html.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    html.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+                // Refresh weather effect for new theme
+                if (typeof window.refreshWeatherEffect === 'function') {
+                    window.refreshWeatherEffect();
+                }
+            });
+
+            // Force light mode for print
+            window.addEventListener('beforeprint', function() {
+                html.removeAttribute('data-theme');
+            });
+
+            window.addEventListener('afterprint', function() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    html.setAttribute('data-theme', 'dark');
+                }
+            });
+        })();
+    </script>
 
     <!-- Weather Effects -->
     <script src="weather-effects.js"></script>
