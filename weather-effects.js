@@ -137,16 +137,47 @@
     }
 
     async function getLocationFromIP() {
-        // Using ip-api.com (free, no API key required, 45 requests/minute)
-        const response = await fetch('http://ip-api.com/json/?fields=status,lat,lon,city,country');
-        const data = await response.json();
+        // Try multiple free HTTPS geolocation APIs as fallbacks
+        const apis = [
+            {
+                url: 'https://ipapi.co/json/',
+                parse: (data) => {
+                    if (data.error) throw new Error(data.reason || 'API error');
+                    return { lat: data.latitude, lon: data.longitude, city: data.city, country: data.country_name };
+                }
+            },
+            {
+                url: 'https://ipwho.is/',
+                parse: (data) => {
+                    if (!data.success) throw new Error('API error');
+                    return { lat: data.latitude, lon: data.longitude, city: data.city, country: data.country };
+                }
+            },
+            {
+                url: 'https://freeipapi.com/api/json',
+                parse: (data) => {
+                    if (!data.latitude) throw new Error('API error');
+                    return { lat: data.latitude, lon: data.longitude, city: data.cityName, country: data.countryName };
+                }
+            }
+        ];
 
-        if (data.status !== 'success') {
-            throw new Error('Failed to get location from IP');
+        let lastError;
+        for (const api of apis) {
+            try {
+                const response = await fetch(api.url);
+                if (!response.ok) continue;
+                const data = await response.json();
+                const location = api.parse(data);
+                console.log(`Location detected: ${location.city}, ${location.country}`);
+                return { lat: location.lat, lon: location.lon };
+            } catch (e) {
+                lastError = e;
+                continue;
+            }
         }
 
-        console.log(`Location detected: ${data.city}, ${data.country}`);
-        return { lat: data.lat, lon: data.lon };
+        throw new Error(lastError?.message || 'Failed to get location from IP');
     }
 
     async function getWeather(lat, lon) {
