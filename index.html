@@ -42,6 +42,11 @@
             --white: #0f172a;
         }
 
+        /* keep in-page jumps clear of the sticky header (height set from JS) */
+        html {
+            scroll-padding-top: var(--header-height, 80px);
+        }
+
         body {
             font-family: 'Source Sans Pro', sans-serif;
             background: var(--white);
@@ -902,6 +907,222 @@
             font-size: 0.9rem;
         }
 
+        /* Work tabs */
+        .tab-list {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            margin-bottom: 40px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-300);
+            border-radius: 999px;
+        }
+
+        .tab {
+            font: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 8px 22px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab[aria-selected="true"] {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .tab:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .tab-panel:focus {
+            outline: none;
+        }
+
+        .tab-panel > section {
+            padding: 0;
+        }
+
+        .tab-panel > section + section {
+            margin-top: 80px;
+        }
+
+        /* Gallery */
+        .gallery-stage {
+            position: relative;
+            padding: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            background:
+                radial-gradient(120% 90% at 20% 0%, #172033 0%, transparent 55%),
+                radial-gradient(90% 80% at 100% 100%, #1a1430 0%, transparent 60%),
+                #07090e;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .gallery-stage.is-collapsed {
+            max-height: 900px;
+        }
+
+        .gallery-stage.is-collapsed::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 220px;
+            background: linear-gradient(to bottom, transparent, #07090e);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .gallery-wall {
+            columns: 5 170px;
+            column-gap: 12px;
+        }
+
+        .gallery-tile {
+            break-inside: avoid;
+            margin-bottom: 12px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: var(--ar);
+            background: #000000;
+            transition: transform 0.35s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        /* red + cyan copies screened together = the original image; offset them to glitch */
+        .gallery-tile::before,
+        .gallery-tile::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: var(--img);
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            mix-blend-mode: screen;
+            filter: brightness(.65);
+            transition: filter 0.3s;
+        }
+
+        .gallery-tile::before {
+            background-color: #ff0000;
+        }
+
+        .gallery-tile::after {
+            background-color: #00ffff;
+        }
+
+        .gallery-tile .scan {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 1px, transparent 1px 3px);
+            transition: opacity 0.3s;
+        }
+
+        .gallery-tile.is-active {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .gallery-tile.is-active::before {
+            filter: none;
+            animation: glitch-a 0.9s steps(2) infinite;
+        }
+
+        .gallery-tile.is-active::after {
+            filter: none;
+            animation: glitch-b 0.9s steps(2) infinite;
+        }
+
+        .gallery-tile.is-active .scan {
+            opacity: 1;
+        }
+
+        @keyframes glitch-a {
+            0%, 100% { transform: translate(-4px, 0); }
+            30% { transform: translate(3px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+        }
+
+        @keyframes glitch-b {
+            0%, 100% { transform: translate(4px, 0); }
+            30% { transform: translate(-3px, 2px); }
+            60% { transform: translate(2px, -1px); }
+        }
+
+        .gallery-more {
+            display: block;
+            margin: 24px auto 0;
+            font: inherit;
+            cursor: pointer;
+            padding: 10px 26px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .tab {
+                padding: 8px 14px;
+                font-size: 0.9rem;
+            }
+
+            .gallery-stage {
+                padding: 8px;
+            }
+
+            .gallery-wall {
+                columns: 2;
+                column-gap: 8px;
+            }
+
+            .gallery-tile {
+                margin-bottom: 8px;
+            }
+
+            .gallery-stage.is-collapsed {
+                max-height: 640px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gallery-tile.is-active::before,
+            .gallery-tile.is-active::after {
+                animation: none;
+            }
+        }
+
+        @media print {
+            .tab-list,
+            #panel-gallery {
+                display: none !important;
+            }
+
+            #panel-career {
+                display: block !important;
+            }
+
+            .tab-panel > section + section {
+                margin-top: 0 !important;
+            }
+        }
+
         @media (max-width: 900px) {
             .hero-inner {
                 grid-template-columns: 1fr;
@@ -958,6 +1179,7 @@
                 <ul>
                     <li><a href="#about">About</a></li>
                     <li><a href="#skills">Skills</a></li>
+                    <li><a href="#work">Gallery</a></li>
                     <li><a href="#experience">Experience</a></li>
                     <li><a href="#education">Education</a></li>
                     <li><a href="#contact">Contact</a></li>
@@ -1008,7 +1230,7 @@
                 <p>I design and build scalable cloud architectures, modernize legacy systems, and create enterprise solutions. With 15+ years of experience, I specialize in mainframe-to-cloud migrations, data harmonization across teams and departments, and AI-driven development with graph technologies.</p>
                 <div class="hero-cta">
                     <a href="mailto:contact@nielsmeierling.de" class="btn btn-primary">Contact Me</a>
-                    <a href="#experience" class="btn btn-outline">View Work</a>
+                    <a href="#work" class="btn btn-outline">View Work</a>
                 </div>
             </div>
             <div class="hero-info">
@@ -1185,134 +1407,152 @@
         </div>
     </section>
 
-    <!-- Experience -->
-    <section id="experience">
-        <h2 class="section-title">Work Experience</h2>
-        <p class="section-subtitle">Highlights of my professional journey in software engineering</p>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2025 - Present</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Principal Software Engineer</h3>
-                    <p class="company">Mercedes-Benz Tech Innovation GmbH</p>
-                    <p>Analyzing potential improvements to the vast system landscape and reducing friction between customer, teams and external supplier.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2023 - 2025</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Senior Software Engineer</h3>
-                    <p class="company">Mercedes-Benz Tech Innovation GmbH</p>
-                    <p>Modernizing legacy mainframe systems to cloud-native architecture. Harmonizing data from various source systems into a unified data platform. Improving scalable solutions for enterprise data integration.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2021 - 2023</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Senior Software Engineer - Business Platform</h3>
-                    <p class="company">Communicode AG (Hörmann)</p>
-                    <p>Migrated legacy Excel and macro-based business tools to a modern Kubernetes-based microservices architecture, improving scalability and maintainability.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2021</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Senior Software Engineer - Digital Marketing Suite</h3>
-                    <p class="company">Communicode AG (LIDL)</p>
-                    <p>Optimized upload portal performance for 3D-based marketing assets serving the European market.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2020 - 2021</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Senior Software Engineer - PIM System</h3>
-                    <p class="company">Communicode AG (infuniq)</p>
-                    <p>Maintained legacy product information management system while designing next-generation cloud-native architecture.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2016 - 2020</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Cloud Engineer - Digital Ecosystem</h3>
-                    <p class="company">Communicode AG (Vorwerk)</p>
-                    <p>Designed and built pipeline automations for various teams to ensure quality and speed of changes for the existing environment. Consulted on integration with the ecosystem's business processes across the organization.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2015 - 2018</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Component Lead - Digital Ecosystem</h3>
-                    <p class="company">Communicode AG (Vorwerk)</p>
-                    <p>Designed and built microservices around the e-commerce monolith for customer data management in AWS. I represented up to 3 teams in an environment of approx. 15 international teams.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2013 - 2015</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Software Engineer - Digital Ecosystem</h3>
-                    <p class="company">Communicode AG (Vorwerk)</p>
-                    <p>Built a large e-commerce backend system for mulit-platform touchpoints and surrounding customer service tooling and processes for connected home appliances (TM5/TM6) in Europe's largest IOT project.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2012 - 2013</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Software Developer</h3>
-                    <p class="company">R&E Media GmbH, Cologne</p>
-                    <p>Maintained software distribution portal and built coupon systems.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">
-                    <div class="year">2009 - 2012</div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Junior Software Developer</h3>
-                    <p class="company">MetaSieve GmbH, Bochum</p>
-                    <p>Learned programming at a university startup. Built order management systems for Unity Media.</p>
-                </div>
-            </div>
+    <!-- Work: Gallery / Experience & Education tabs -->
+    <section class="tabs-section" id="work">
+        <div class="tab-list" role="tablist" aria-label="Work">
+            <button class="tab" role="tab" id="tab-gallery" aria-controls="panel-gallery" aria-selected="true">Gallery</button>
+            <button class="tab" role="tab" id="tab-career" aria-controls="panel-career" aria-selected="false" tabindex="-1">Experience &amp; Education</button>
         </div>
-    </section>
 
-    <!-- Education -->
-    <section id="education">
-        <h2 class="section-title">Education</h2>
-        <p class="section-subtitle">Academic background and certifications</p>
-        <div class="edu-grid">
-            <div class="edu-card">
-                <span class="year">2008 - 2012</span>
-                <h3>B.Sc. Applied Computer Science</h3>
-                <p>Ruhr University Bochum</p>
+        <div class="tab-panel" role="tabpanel" id="panel-gallery" aria-labelledby="tab-gallery" tabindex="0">
+            <p class="section-subtitle">These are some screens and concepts I was working on in the last year:</p>
+            <div class="gallery-stage" id="gallery-stage">
+                <div class="gallery-wall" id="gallery-wall"></div>
             </div>
-            <div class="edu-card">
-                <span class="year">2005 - 2008</span>
-                <h3>IT Specialist - System Integration</h3>
-                <p>ServeNet GmbH, Wuppertal</p>
+            <button class="gallery-more btn-outline" id="gallery-more" hidden>Show all</button>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-career" aria-labelledby="tab-career" tabindex="0" hidden>
+        <!-- Experience -->
+        <section id="experience-section">
+            <h2 class="section-title">Work Experience</h2>
+            <p class="section-subtitle">Highlights of my professional journey in software engineering</p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2025 - Present</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Principal Software Engineer</h3>
+                        <p class="company">Mercedes-Benz Tech Innovation GmbH</p>
+                        <p>Analyzing potential improvements to the vast system landscape and reducing friction between customer, teams and external supplier.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2023 - 2025</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Senior Software Engineer</h3>
+                        <p class="company">Mercedes-Benz Tech Innovation GmbH</p>
+                        <p>Modernizing legacy mainframe systems to cloud-native architecture. Harmonizing data from various source systems into a unified data platform. Improving scalable solutions for enterprise data integration.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2021 - 2023</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Senior Software Engineer - Business Platform</h3>
+                        <p class="company">Communicode AG (Hörmann)</p>
+                        <p>Migrated legacy Excel and macro-based business tools to a modern Kubernetes-based microservices architecture, improving scalability and maintainability.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2021</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Senior Software Engineer - Digital Marketing Suite</h3>
+                        <p class="company">Communicode AG (LIDL)</p>
+                        <p>Optimized upload portal performance for 3D-based marketing assets serving the European market.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2020 - 2021</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Senior Software Engineer - PIM System</h3>
+                        <p class="company">Communicode AG (infuniq)</p>
+                        <p>Maintained legacy product information management system while designing next-generation cloud-native architecture.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2016 - 2020</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Cloud Engineer - Digital Ecosystem</h3>
+                        <p class="company">Communicode AG (Vorwerk)</p>
+                        <p>Designed and built pipeline automations for various teams to ensure quality and speed of changes for the existing environment. Consulted on integration with the ecosystem's business processes across the organization.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2015 - 2018</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Component Lead - Digital Ecosystem</h3>
+                        <p class="company">Communicode AG (Vorwerk)</p>
+                        <p>Designed and built microservices around the e-commerce monolith for customer data management in AWS. I represented up to 3 teams in an environment of approx. 15 international teams.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2013 - 2015</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Software Engineer - Digital Ecosystem</h3>
+                        <p class="company">Communicode AG (Vorwerk)</p>
+                        <p>Built a large e-commerce backend system for mulit-platform touchpoints and surrounding customer service tooling and processes for connected home appliances (TM5/TM6) in Europe's largest IOT project.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2012 - 2013</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Software Developer</h3>
+                        <p class="company">R&E Media GmbH, Cologne</p>
+                        <p>Maintained software distribution portal and built coupon systems.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="year">2009 - 2012</div>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Junior Software Developer</h3>
+                        <p class="company">MetaSieve GmbH, Bochum</p>
+                        <p>Learned programming at a university startup. Built order management systems for Unity Media.</p>
+                    </div>
+                </div>
             </div>
-            <div class="edu-card">
-                <span class="year">2005</span>
-                <h3>Abitur</h3>
-                <p>Röntgen Gymnasium<br>Math / English Focus</p>
+        </section>
+
+        <!-- Education -->
+        <section id="education-section">
+            <h2 class="section-title">Education</h2>
+            <p class="section-subtitle">Academic background and certifications</p>
+            <div class="edu-grid">
+                <div class="edu-card">
+                    <span class="year">2008 - 2012</span>
+                    <h3>B.Sc. Applied Computer Science</h3>
+                    <p>Ruhr University Bochum</p>
+                </div>
+                <div class="edu-card">
+                    <span class="year">2005 - 2008</span>
+                    <h3>IT Specialist - System Integration</h3>
+                    <p>ServeNet GmbH, Wuppertal</p>
+                </div>
+                <div class="edu-card">
+                    <span class="year">2005</span>
+                    <h3>Abitur</h3>
+                    <p>Röntgen Gymnasium<br>Math / English Focus</p>
+                </div>
             </div>
+        </section>
         </div>
     </section>
 
@@ -1374,6 +1614,114 @@
                     html.setAttribute('data-theme', 'dark');
                 }
             });
+        })();
+    </script>
+
+    <!-- Gallery + Tabs -->
+    <script src="gallery/manifest.js"></script>
+    <script>
+        (function() {
+            const header = document.querySelector('header');
+            function syncHeaderHeight() {
+                document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
+            }
+            syncHeaderHeight();
+            window.addEventListener('resize', syncHeaderHeight);
+
+            const tabs = [...document.querySelectorAll('.tab')];
+            const careerTab = document.getElementById('tab-career');
+
+            function selectTab(tab, focus) {
+                tabs.forEach(function(t) {
+                    const selected = t === tab;
+                    t.setAttribute('aria-selected', selected);
+                    t.tabIndex = selected ? 0 : -1;
+                    document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+                });
+                if (focus) tab.focus();
+                if (tab.id === 'tab-gallery') setupCollapse();
+            }
+
+            tabs.forEach(function(tab, i) {
+                tab.addEventListener('click', function() { selectTab(tab); });
+                tab.addEventListener('keydown', function(e) {
+                    let next = null;
+                    if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+                    if (e.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
+                    if (e.key === 'Home') next = tabs[0];
+                    if (e.key === 'End') next = tabs[tabs.length - 1];
+                    if (next) { e.preventDefault(); selectTab(next, true); }
+                });
+            });
+
+            // In-page links that pick a tab: [tab to activate, element to scroll to].
+            // No element carries these ids, so the browser never jumps on its own and fights this routing.
+            const galleryTab = document.getElementById('tab-gallery');
+            const routes = {
+                '#work': [galleryTab, 'work'],
+                '#experience': [careerTab, 'work'],
+                '#education': [careerTab, 'education-section']
+            };
+            function go(hash) {
+                const route = routes[hash];
+                if (!route) return false;
+                selectTab(route[0]);
+                document.getElementById(route[1]).scrollIntoView();
+                return true;
+            }
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a[href^="#"]');
+                if (!link) return;
+                const hash = link.getAttribute('href');
+                if (go(hash)) {
+                    e.preventDefault();
+                    if (location.hash !== hash) history.pushState(null, '', hash);
+                }
+            });
+            window.addEventListener('hashchange', function() { go(location.hash); });
+            if (location.hash) go(location.hash);
+
+            // Gallery wall
+            const images = window.GALLERY || [];
+            const stage = document.getElementById('gallery-stage');
+            const wall = document.getElementById('gallery-wall');
+            const more = document.getElementById('gallery-more');
+
+            wall.innerHTML = images.map(function(im) {
+                return '<div class="gallery-tile" style="--ar:' + im.w + '/' + im.h + ';--img:url(' + im.src + ')"><span class="scan"></span></div>';
+            }).join('');
+
+            // hover on desktop, tap-to-toggle on touch
+            wall.querySelectorAll('.gallery-tile').forEach(function(tile) {
+                tile.addEventListener('pointerenter', function(e) { if (e.pointerType !== 'touch') tile.classList.add('is-active'); });
+                tile.addEventListener('pointerleave', function(e) { if (e.pointerType !== 'touch') tile.classList.remove('is-active'); });
+                tile.addEventListener('pointerdown', function(e) {
+                    if (e.pointerType !== 'touch') return;
+                    const wasActive = tile.classList.contains('is-active');
+                    wall.querySelectorAll('.is-active').forEach(function(t) { t.classList.remove('is-active'); });
+                    if (!wasActive) tile.classList.add('is-active');
+                });
+            });
+
+            // Collapse the wall to a preview with a "Show all" toggle (measured once the panel is visible)
+            let collapseReady = false;
+            function setupCollapse() {
+                if (collapseReady || stage.offsetParent === null) return;
+                collapseReady = true;
+                stage.classList.add('is-collapsed');
+                if (stage.scrollHeight <= stage.clientHeight + 40) {
+                    stage.classList.remove('is-collapsed');
+                    return;
+                }
+                more.hidden = false;
+                more.textContent = 'Show all ' + images.length;
+                more.addEventListener('click', function() {
+                    const collapsed = stage.classList.toggle('is-collapsed');
+                    more.textContent = collapsed ? 'Show all ' + images.length : 'Show less';
+                    if (collapsed) stage.scrollIntoView({ block: 'nearest' });
+                });
+            }
+            setupCollapse();
         })();
     </script>
 
